@@ -58,6 +58,10 @@ module Docs
         end
 
         css('dt').each do |node|
+          next if current_url.host == 'matplotlib.org'
+          next if current_url.host == 'numpy.org'
+          next if current_url.host == 'requests.readthedocs.io'
+          next if current_url.host == 'scikit-learn.org'
           next unless node['id'] || node.at_css('code, .classifier')
           links = []
           links << node.children.last.remove while node.children.last.try(:name) == 'a'

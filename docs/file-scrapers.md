@@ -23,9 +23,21 @@ and put it in `/path/to/devdocs/docs/`
 Or run the following commands in your terminal:
 
 ```sh
-curl https://storage.googleapis.com/dart-archive/channels/stable/release/$RELEASE/api-docs/dartdocs-gen-api-zip > dartApi.zip; \
+curl https://storage.googleapis.com/dart-archive/channels/stable/release/$RELEASE/api-docs/dartdocs-gen-api.zip > dartApi.zip; \
 unzip dartApi.zip; mv gen-dartdocs docs/dart~$VERSION
 ```
+
+## date-fns
+
+```sh
+git clone https://github.com/date-fns/date-fns docs/date_fns
+cd docs/date_fns
+git checkout v2.29.2
+yarn install
+node scripts/build/docs.js
+ls tmp/docs.json
+```
+
 ## Django
 
 Go to https://docs.djangoproject.com/, select the version from the
@@ -53,7 +65,7 @@ Go to https://www.erlang.org/downloads and download the HTML documentation file.
 
 ```ah
 mkdir --parent docs/erlang\~$VERSION/; \
-curl http://erlang.org/download/otp_doc_html_$RELEASE.tar.gz | \
+curl -L https://github.com/erlang/otp/releases/download/OTP-$RELEASE/otp_doc_html_$RELEASE.tar.gz | \
 bsdtar --extract --file - --directory=docs/erlang\~$VERSION/
 ```
 
@@ -90,6 +102,15 @@ Go to https://gcc.gnu.org/onlinedocs/ and download the HTML tarball of Fortran m
 mkdir docs/gnu_fortran~$VERSION; \
 curl https://gcc.gnu.org/onlinedocs/gcc-$RELEASE/gfortran-html.tar.gz | \
 tar --extract --gzip --strip-components=1 --directory=docs/gnu_fortran~$VERSION
+```
+
+## GNU Make
+Go to https://www.gnu.org/software/make/manual/, download the HTML tarball and extract its content in `/path/to/devdocs/docs/gnu_make` or run the following command:
+
+```sh
+mkdir /path/to/devdocs/docs/gnu_make \
+&& curl https://www.gnu.org/software/make/manual/make.html_node.tar.gz | \
+tar --extract --gzip --strip-components=1 --directory=/path/to/devdocs/docs/gnu_make
 ```
 
 ## Gnuplot
@@ -142,11 +163,11 @@ bsdtar --extract --file=- --directory=docs/numpy~$VERSION/
 ## OCaml
 
 Download from https://www.ocaml.org/docs/ the HTML reference:
-https://ocaml.org/releases/4.11/ocaml-4.11-refman-html.tar.gz
+https://v2.ocaml.org/releases/4.14/ocaml-4.14-refman-html.tar.gz
 and extract it as `/path/to/devdocs/docs/ocaml`:
 
 ```sh
-curl https://ocaml.org/releases/$VERSION/ocaml-$VERSION-refman-html.tar.gz | \
+curl https://v2.ocaml.org/releases/$VERSION/ocaml-$VERSION-refman-html.tar.gz | \
 tar xz --transform 's/htmlman/ocaml/' --directory docs/
 ```
 
@@ -154,6 +175,13 @@ tar xz --transform 's/htmlman/ocaml/' --directory docs/
 Search 'Openjdk' in https://www.debian.org/distrib/packages, find the `openjdk-$VERSION-doc` package,
 download it, extract it with `dpkg -x $PACKAGE ./` and move `./usr/share/doc/openjdk-16-jre-headless/api/`
 to `path/to/devdocs/docs/openjdk~$VERSION`
+
+```
+curl http://ftp.at.debian.org/debian/pool/main/o/openjdk-19/openjdk-19-doc_19+36-2_all.deb &&
+tar xf openjdk-19-doc_19+36-2_all.deb
+tar xf data.tar.xz
+mv ./usr/share/doc/openjdk-19-jre-headless/api/ path/to/devdocs/docs/openjdk~$VERSION
+```
 
 If you use or have access to a Debian-based GNU/Linux distribution you can run the following command:
 ```sh
@@ -166,20 +194,17 @@ mv ./usr/share/doc/openjdk-16-jre-headless/api/ path/to/devdocs/docs/openjdk~$VE
 ## Pandas
 
 ```sh
-mkdir docs/pandas~1
-cd docs/pandas~1
-curl https://pandas.pydata.org/docs/pandas.zip
-bsdtar xf pandas.zip
+curl https://pandas.pydata.org/docs/pandas.zip | bsdtar --extract --file - --directory=docs/pandas~1
 ```
 
 ## PHP
-Click the link under the "Many HTML files" column on https://www.php.net/download-docs.php, extract the tarball, change its name to `php` and put it in `/path/to/devdocs/docs/`.
+Click the link under the "Many HTML files" column on https://www.php.net/download-docs.php, extract the tarball, change its name to `php` and put it in `docs/`.
 
 Or run the following commands in your terminal:
 
 ```sh
 curl https://www.php.net/distributions/manual/php_manual_en.tar.gz > php.tar; \
-tar -xf php.tar; mv php-chunked-xhtml/ path/to/devdocs/docs/php/
+tar -xf php.tar; mv php-chunked-xhtml/ docs/php/
 ```
 ## Python 3.6+
 
@@ -226,6 +251,13 @@ done
 ### Nokogiri
 ### Ruby / Minitest
 ### Ruby on Rails
+* Download a release at https://github.com/rails/rails/releases or clone https://github.com/rails/rails.git (checkout to the branch of the rails' version that is going to be scraped)
+* Open "railties/lib/rails/api/task.rb" and comment out any code related to sdoc ("configure_sdoc")
+* Run "bundle install --without db && bundle exec rake rdoc" (in the Rails directory)
+* Run "cd guides && bundle exec rake guides:generate:html"
+* Copy the "guides/output" directory to "html/guides"
+* Copy the "html" directory to "docs/rails~[version]"
+
 ### Ruby
 Download the tarball of Ruby from https://www.ruby-lang.org/en/downloads/, extract it, run
 `./configure && make html` in your terminal (while your are in the ruby directory) and move
@@ -248,3 +280,7 @@ See `lib/docs/scrapers/scala.rb`
 
 Download the docs from https://sqlite.org/download.html, unzip it, and rename
 it to `/path/to/devdocs/docs/sqlite`
+
+```sh
+curl https://sqlite.org/2022/sqlite-doc-3400000.zip | bsdtar --extract --file - --directory=docs/sqlite/ --strip-components=1
+```
